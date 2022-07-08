@@ -9,6 +9,7 @@ from colorama import init, Fore, Style
 from termcolor import colored
 from progress.bar import Bar
 from datetime import datetime
+from natsort import natsorted
 
 init(convert=True)
 
@@ -33,7 +34,7 @@ while True:
 overwrite = 0
 
 while True:
-    endName = input("Enter merged file name with file type (.cbz, .zip, .rar, .cbr support. <name of the input folder>.cbr by default): ") or "{0}.cbr".format(bookPartsDir)
+    endName = input("Enter merged file name with file type (.cbz, .zip, .rar, .cbr support. <name of the input folder>.cbz by default): ") or "{0}.cbz".format(bookPartsDir)
     if (endName in os.listdir(os.path.join(root, "output"))):
         print(colored("Name \"{0}\" already existed.".format(endName), "red"))
         while True:
@@ -65,7 +66,8 @@ if ("temp" not in os.listdir()):
 if ("input" not in os.listdir()):
     os.mkdir("input")
 
-bookPartsList = os.listdir(bookPath)
+bookPartsList = natsorted(os.listdir(bookPath))
+while ".DS_Store" in bookPartsList: bookPartsList.remove(".DS_Store")
 
 progressBar = Bar('Processing', max=len(bookPartsList))
 progressBar.update()
@@ -79,7 +81,7 @@ if (endTypeMode == "zip"):
         partPath = os.path.join(bookPath, part)
 
         if os.path.isdir(partPath):
-            filesList = os.listdir(partPath)
+            filesList = natsorted(os.listdir(partPath))
             for i in range(len(filesList)):
                 item = open(os.path.join(partPath, filesList[i]), "rb")
                 itemData = item.read()
@@ -213,4 +215,4 @@ if (errorsCount > 0):
     print(colored("Go to errorLogs folder for list of the error files.", "yellow"))
 
 print(colored("Done", "green"))
-input()
+exit()
